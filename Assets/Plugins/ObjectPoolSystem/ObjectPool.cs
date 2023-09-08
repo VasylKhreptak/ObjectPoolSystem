@@ -47,19 +47,8 @@ namespace Plugins.ObjectPoolSystem
 
             if (_totalPool.Count < _maxSize)
             {
-                GameObject instance = _createFunc();
-                instance.SetActive(true);
-
-                PooledObject pooledObject = new PooledObject
-                {
-                    GameObject = instance
-                };
-
-                StartObserving(pooledObject);
-
-                _totalPool.Add(pooledObject);
-                _activePool.Add(pooledObject);
-                return instance;
+                Expand();
+                return Get();
             }
 
             PooledObject lastPooledObject = _activePool.Last();
@@ -84,19 +73,24 @@ namespace Plugins.ObjectPoolSystem
         {
             for (int i = 0; i < _initialSize; i++)
             {
-                GameObject instance = _createFunc();
-                instance.SetActive(false);
-
-                PooledObject pooledObject = new PooledObject
-                {
-                    GameObject = instance
-                };
-
-                StartObserving(pooledObject);
-
-                _totalPool.Add(pooledObject);
-                _inactivePool.Add(pooledObject);
+                Expand();
             }
+        }
+
+        private void Expand()
+        {
+            GameObject instance = _createFunc();
+            instance.SetActive(false);
+
+            PooledObject pooledObject = new PooledObject
+            {
+                GameObject = instance
+            };
+
+            StartObserving(pooledObject);
+
+            _totalPool.Add(pooledObject);
+            _inactivePool.Add(pooledObject);
         }
 
         private void StartObserving(PooledObject pooledObject)
