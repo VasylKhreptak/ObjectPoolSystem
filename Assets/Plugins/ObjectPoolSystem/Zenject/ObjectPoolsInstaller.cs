@@ -13,12 +13,12 @@ namespace Plugins.ObjectPoolSystem.Zenject
         {
             foreach (var preference in _objectPoolPreferences)
             {
-                preference.CreateFunc = () => Instantiate(Container.InstantiatePrefab(preference.Prefab, transform));
+                preference.CreateFunc = () => Container.InstantiatePrefab(preference.Prefab, transform);
             }
 
             ObjectPools<T> objectPools = new ObjectPools<T>(_objectPoolPreferences);
 
-            Container.Bind<ObjectPools<T>>().FromInstance(objectPools).AsSingle();
+            Container.BindInstance(objectPools).AsSingle();
         }
     }
 }

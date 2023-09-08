@@ -2,6 +2,6 @@
 {
     public enum MainPool
     {
-        Coin = 0,
+        Sphere = 0,
     }
 }

@@ -26,10 +26,9 @@ namespace Plugins.ObjectPoolSystem
             }
         }
 
-        public bool TryGetPool(T key, out ObjectPool pool)
-        {
-            return _pools.TryGetValue(key, out pool);
-        }
+        public bool TryGetPool(T key, out ObjectPool pool) => _pools.TryGetValue(key, out pool);
+
+        public ObjectPool GetPool(T key) => _pools[key];
 
         public void Clear()
         {
