@@ -8,7 +8,7 @@ using Object = UnityEngine.Object;
 
 namespace Plugins.ObjectPoolSystem
 {
-    public class ObjectPool
+    public class ObjectPool : IObjectPool, IDisposable
     {
         private readonly HashSet<PooledObject> _totalPool = new HashSet<PooledObject>();
         private readonly HashSet<PooledObject> _activePool = new HashSet<PooledObject>();
@@ -71,10 +71,7 @@ namespace Plugins.ObjectPoolSystem
 
         private void Init()
         {
-            for (int i = 0; i < _initialSize; i++)
-            {
-                Expand();
-            }
+            Expand(_initialSize);
         }
 
         private void Expand()
@@ -91,6 +88,14 @@ namespace Plugins.ObjectPoolSystem
 
             _totalPool.Add(pooledObject);
             _inactivePool.Add(pooledObject);
+        }
+
+        private void Expand(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                Expand();
+            }
         }
 
         private void StartObserving(PooledObject pooledObject)
@@ -132,5 +137,7 @@ namespace Plugins.ObjectPoolSystem
 
             OnDestroyedObject?.Invoke(pooledObject.GameObject);
         }
+
+        public void Dispose() => Clear();
     }
 }

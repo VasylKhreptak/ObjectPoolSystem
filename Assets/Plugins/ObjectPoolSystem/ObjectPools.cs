@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Plugins.ObjectPoolSystem
 {
-    public class ObjectPools<T> where T : Enum
+    public class ObjectPools<T> : IObjectPools<T>, IDisposable where T : Enum
     {
         private readonly Dictionary<T, ObjectPool> _pools = new Dictionary<T, ObjectPool>();
 
@@ -40,20 +40,12 @@ namespace Plugins.ObjectPoolSystem
             OnCleared?.Invoke();
         }
 
+        public void Dispose() => Clear();
+
         private void InvokeOnEnabledObject(GameObject gameObject) => OnEnabledObject?.Invoke(gameObject);
 
         private void InvokeOnDisabledObject(GameObject gameObject) => OnDisabledObject?.Invoke(gameObject);
 
         private void InvokeOnDestroyedObject(GameObject gameObject) => OnDestroyedObject?.Invoke(gameObject);
-    }
-
-    [Serializable]
-    public class ObjectPoolPreference<T>
-    {
-        public T Key;
-        public Func<GameObject> CreateFunc;
-        public GameObject Prefab;
-        public int InitialSize;
-        public int MaxSize;
     }
 }
