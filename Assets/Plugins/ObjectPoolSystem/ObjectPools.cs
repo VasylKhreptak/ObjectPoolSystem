@@ -15,7 +15,7 @@ namespace Plugins.ObjectPoolSystem
 
         public ObjectPools(ObjectPoolPreference<T>[] objectPoolPreferences)
         {
-            foreach (var preference in objectPoolPreferences)
+            foreach (ObjectPoolPreference<T> preference in objectPoolPreferences)
             {
                 ObjectPool objectPool = new ObjectPool(preference.CreateFunc, preference.InitialSize, preference.MaxSize);
                 _pools.Add(preference.Key, objectPool);
@@ -32,7 +32,7 @@ namespace Plugins.ObjectPoolSystem
 
         public void Clear()
         {
-            foreach (var pool in _pools.Values)
+            foreach (ObjectPool pool in _pools.Values)
             {
                 pool.Clear();
             }

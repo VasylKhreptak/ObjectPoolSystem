@@ -61,7 +61,7 @@ namespace Plugins.ObjectPoolSystem
 
         public void Clear()
         {
-            foreach (var pooledObject in _totalPool.ToList())
+            foreach (PooledObject pooledObject in _totalPool.ToList())
             {
                 Object.Destroy(pooledObject.GameObject);
             }
@@ -104,7 +104,9 @@ namespace Plugins.ObjectPoolSystem
 
             pooledObject.GameObject.OnEnableAsObservable().Subscribe(_ => OnEnabled(pooledObject)).AddTo(pooledObject.Subscriptions);
             pooledObject.GameObject.OnDisableAsObservable().Subscribe(_ => OnDisabled(pooledObject)).AddTo(pooledObject.Subscriptions);
-            pooledObject.GameObject.OnDestroyAsObservable().Subscribe(_ => OnDestroyed(pooledObject)).AddTo(pooledObject.Subscriptions);
+            pooledObject.GameObject.OnDestroyAsObservable()
+                .Subscribe(_ => OnDestroyed(pooledObject))
+                .AddTo(pooledObject.Subscriptions);
         }
 
         private void StopObserving(PooledObject pooledObject)

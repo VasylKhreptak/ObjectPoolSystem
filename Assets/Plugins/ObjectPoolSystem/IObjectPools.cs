@@ -11,7 +11,7 @@ namespace Plugins.ObjectPoolSystem
         public event Action OnCleared;
 
         public bool TryGetPool(T key, out ObjectPool pool);
-        
+
         public ObjectPool GetPool(T key);
 
         public void Clear();
