@@ -33,9 +33,7 @@ namespace Plugins.ObjectPoolSystem
         public void Clear()
         {
             foreach (ObjectPool pool in _pools.Values)
-            {
                 pool.Clear();
-            }
 
             OnCleared?.Invoke();
         }
