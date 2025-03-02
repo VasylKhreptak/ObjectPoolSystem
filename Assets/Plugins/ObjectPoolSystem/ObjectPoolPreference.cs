@@ -1,4 +1,5 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Plugins.ObjectPoolSystem
@@ -7,9 +8,9 @@ namespace Plugins.ObjectPoolSystem
     public class ObjectPoolPreference<T>
     {
         public T Key;
-        public Func<GameObject> CreateFunc;
+        public Func<UniTask<GameObject>> CreateFunc;
         public GameObject Prefab;
         public int InitialSize;
-        public int MaxSize;
+        public int MaxSize = 20;
     }
 }

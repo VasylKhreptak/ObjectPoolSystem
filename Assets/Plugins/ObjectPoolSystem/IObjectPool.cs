@@ -1,4 +1,5 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Plugins.ObjectPoolSystem
@@ -10,7 +11,13 @@ namespace Plugins.ObjectPoolSystem
         public event Action<GameObject> OnDestroyedObject;
         public event Action OnCleared;
 
-        public GameObject Get();
+        public UniTask Initialize();
+        
+        public UniTask<GameObject> Get();
+
+        public UniTask Expand();
+
+        public UniTask Expand(int count);
 
         public void Clear();
     }

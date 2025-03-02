@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UniRx;
 using UniRx.Triggers;
 using UnityEngine;
@@ -17,14 +19,15 @@ namespace Plugins.ObjectPoolSystem
         private readonly int _initialSize;
         private readonly int _maxSize;
 
-        private readonly Func<GameObject> _createFunc;
+        private readonly CancellationTokenSource _disposeCts = new CancellationTokenSource();
+        private readonly Func<UniTask<GameObject>> _createFunc;
 
         public event Action<GameObject> OnEnabledObject;
         public event Action<GameObject> OnDisabledObject;
         public event Action<GameObject> OnDestroyedObject;
         public event Action OnCleared;
 
-        public ObjectPool(Func<GameObject> createFunc, int initialSize = 16, int maxSize = 256)
+        public ObjectPool(Func<UniTask<GameObject>> createFunc, int initialSize = 16, int maxSize = 256)
         {
             initialSize = Mathf.Max(0, initialSize);
             maxSize = Mathf.Max(initialSize, maxSize);
@@ -32,11 +35,9 @@ namespace Plugins.ObjectPoolSystem
             _createFunc = createFunc;
             _initialSize = initialSize;
             _maxSize = maxSize;
-
-            Init();
         }
 
-        public GameObject Get()
+        public async UniTask<GameObject> Get()
         {
             if (_inactivePool.Count > 0)
             {
@@ -47,8 +48,8 @@ namespace Plugins.ObjectPoolSystem
 
             if (_totalPool.Count < _maxSize)
             {
-                Expand();
-                return Get();
+                await Expand();
+                return await Get();
             }
 
             PooledObject lastPooledObject = _activePool.Last();
@@ -67,11 +68,11 @@ namespace Plugins.ObjectPoolSystem
             OnCleared?.Invoke();
         }
 
-        private void Init() => Expand(_initialSize);
+        public async UniTask Initialize() => await Expand(_initialSize);
 
-        private void Expand()
+        public async UniTask Expand()
         {
-            GameObject instance = _createFunc();
+            GameObject instance = await _createFunc();
             instance.SetActive(false);
 
             PooledObject pooledObject = new PooledObject
@@ -85,10 +86,10 @@ namespace Plugins.ObjectPoolSystem
             _inactivePool.Add(pooledObject);
         }
 
-        private void Expand(int count)
+        public async UniTask Expand(int count)
         {
             for (int i = 0; i < count; i++)
-                Expand();
+                await Expand();
         }
 
         private void StartObserving(PooledObject pooledObject)
@@ -128,6 +129,10 @@ namespace Plugins.ObjectPoolSystem
             OnDestroyedObject?.Invoke(pooledObject.GameObject);
         }
 
-        public void Dispose() => Clear();
+        public void Dispose()
+        {
+            _disposeCts.Cancel();
+            Clear();
+        }
     }
 }
