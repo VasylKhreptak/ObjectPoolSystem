@@ -27,18 +27,14 @@ namespace Plugins.ObjectPoolSystem
             }
         }
 
+        public async UniTask Initialize()
+        {
+            foreach (ObjectPool pool in _pools.Values)
+                await pool.Initialize();
+        }
+
         public bool TryGetPool(T key, out ObjectPool pool) => _pools.TryGetValue(key, out pool);
 
-        public UniTask Initialize()
-        {
-            List<UniTask> tasks = new List<UniTask>();
-
-            foreach (ObjectPool pool in _pools.Values)
-                tasks.Add(pool.Initialize());
-
-            return UniTask.WhenAll(tasks);
-        }
-        
         public ObjectPool GetPool(T key) => _pools[key];
 
         public void Clear()
