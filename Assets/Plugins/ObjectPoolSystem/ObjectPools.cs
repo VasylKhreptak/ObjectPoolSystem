@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Plugins.ObjectPoolSystem
@@ -28,6 +29,16 @@ namespace Plugins.ObjectPoolSystem
 
         public bool TryGetPool(T key, out ObjectPool pool) => _pools.TryGetValue(key, out pool);
 
+        public UniTask Initialize()
+        {
+            List<UniTask> tasks = new List<UniTask>();
+
+            foreach (ObjectPool pool in _pools.Values)
+                tasks.Add(pool.Initialize());
+
+            return UniTask.WhenAll(tasks);
+        }
+        
         public ObjectPool GetPool(T key) => _pools[key];
 
         public void Clear()
