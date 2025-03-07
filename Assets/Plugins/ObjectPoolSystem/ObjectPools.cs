@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ namespace Plugins.ObjectPoolSystem
 {
     public class ObjectPools<T> : IObjectPools<T>, IDisposable where T : Enum
     {
-        private readonly Dictionary<T, ObjectPool> _pools = new Dictionary<T, ObjectPool>();
+        private readonly Dictionary<T, IObjectPool> _pools = new Dictionary<T, IObjectPool>();
 
         public event Action<GameObject> OnEnabledObject;
         public event Action<GameObject> OnDisabledObject;
@@ -27,19 +28,17 @@ namespace Plugins.ObjectPoolSystem
             }
         }
 
-        public async UniTask Initialize()
+        public async UniTask Initialize(CancellationToken token = default)
         {
-            foreach (ObjectPool pool in _pools.Values)
-                await pool.Initialize();
+            foreach (IObjectPool pool in _pools.Values)
+                await pool.Initialize(token);
         }
 
-        public bool TryGetPool(T key, out ObjectPool pool) => _pools.TryGetValue(key, out pool);
-
-        public ObjectPool GetPool(T key) => _pools[key];
+        public IObjectPool Get(T key) => _pools[key];
 
         public void Clear()
         {
-            foreach (ObjectPool pool in _pools.Values)
+            foreach (IObjectPool pool in _pools.Values)
                 pool.Clear();
 
             OnCleared?.Invoke();

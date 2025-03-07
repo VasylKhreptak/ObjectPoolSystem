@@ -20,7 +20,7 @@ namespace Plugins.ObjectPoolSystem
         private readonly int _maxSize;
 
         private readonly CancellationTokenSource _disposeCts = new CancellationTokenSource();
-        private readonly Func<UniTask<GameObject>> _createFunc;
+        private readonly Func<CancellationToken, UniTask<GameObject>> _createFunc;
 
         public int TotalCount => _totalPool.Count;
         public int ActiveCount => _activePool.Count;
@@ -31,7 +31,7 @@ namespace Plugins.ObjectPoolSystem
         public event Action<GameObject> OnDestroyedObject;
         public event Action OnCleared;
 
-        public ObjectPool(Func<UniTask<GameObject>> createFunc, int initialSize = 16, int maxSize = 256)
+        public ObjectPool(Func<CancellationToken, UniTask<GameObject>> createFunc, int initialSize = 16, int maxSize = 256)
         {
             initialSize = Mathf.Max(0, initialSize);
             maxSize = Mathf.Max(initialSize, maxSize);
@@ -41,7 +41,7 @@ namespace Plugins.ObjectPoolSystem
             _maxSize = maxSize;
         }
 
-        public async UniTask<GameObject> Get()
+        public async UniTask<GameObject> Get(CancellationToken token)
         {
             if (_inactivePool.Count > 0)
             {
@@ -52,8 +52,8 @@ namespace Plugins.ObjectPoolSystem
 
             if (_totalPool.Count < _maxSize)
             {
-                await Expand();
-                return await Get();
+                await Expand(token);
+                return await Get(token);
             }
 
             PooledObject lastPooledObject = _activePool.Last();
@@ -72,11 +72,11 @@ namespace Plugins.ObjectPoolSystem
             OnCleared?.Invoke();
         }
 
-        public async UniTask Initialize() => await Expand(_initialSize);
+        public async UniTask Initialize(CancellationToken token) => await Expand(_initialSize, token);
 
-        public async UniTask Expand()
+        public async UniTask Expand(CancellationToken token)
         {
-            GameObject instance = await _createFunc();
+            GameObject instance = await _createFunc(token);
             instance.SetActive(false);
 
             PooledObject pooledObject = new PooledObject
@@ -90,10 +90,10 @@ namespace Plugins.ObjectPoolSystem
             _inactivePool.Add(pooledObject);
         }
 
-        public async UniTask Expand(int count)
+        public async UniTask Expand(int count, CancellationToken token)
         {
             for (int i = 0; i < count; i++)
-                await Expand();
+                await Expand(token);
         }
 
         private void StartObserving(PooledObject pooledObject)
