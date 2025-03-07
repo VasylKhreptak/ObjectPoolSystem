@@ -22,6 +22,10 @@ namespace Plugins.ObjectPoolSystem
         private readonly CancellationTokenSource _disposeCts = new CancellationTokenSource();
         private readonly Func<UniTask<GameObject>> _createFunc;
 
+        public int TotalCount => _totalPool.Count;
+        public int ActiveCount => _activePool.Count;
+        public int InactiveCount => _inactivePool.Count;
+
         public event Action<GameObject> OnEnabledObject;
         public event Action<GameObject> OnDisabledObject;
         public event Action<GameObject> OnDestroyedObject;

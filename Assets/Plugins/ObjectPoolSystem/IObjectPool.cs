@@ -6,6 +6,10 @@ namespace Plugins.ObjectPoolSystem
 {
     public interface IObjectPool
     {
+        public int TotalCount { get; }
+        public int ActiveCount { get; }
+        public int InactiveCount { get; }
+        
         public event Action<GameObject> OnEnabledObject;
         public event Action<GameObject> OnDisabledObject;
         public event Action<GameObject> OnDestroyedObject;
