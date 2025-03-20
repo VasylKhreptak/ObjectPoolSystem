@@ -22,9 +22,9 @@ namespace Plugins.ObjectPoolSystem
                 ObjectPool objectPool = new ObjectPool(preference.CreateFunc, preference.InitialSize, preference.MaxSize);
                 _pools.Add(preference.Key, objectPool);
 
-                objectPool.OnEnabledObject += InvokeOnEnabledObject;
-                objectPool.OnDisabledObject += InvokeOnDisabledObject;
-                objectPool.OnDestroyedObject += InvokeOnDestroyedObject;
+                objectPool.OnEnabledObject += InvokeOnEnabledObjectEvent;
+                objectPool.OnDisabledObject += InvokeOnDisabledObjectEvent;
+                objectPool.OnDestroyedObject += InvokeOnDestroyedObjectEvent;
             }
         }
 
@@ -46,10 +46,10 @@ namespace Plugins.ObjectPoolSystem
 
         public void Dispose() => Clear();
 
-        private void InvokeOnEnabledObject(GameObject gameObject) => OnEnabledObject?.Invoke(gameObject);
+        private void InvokeOnEnabledObjectEvent(GameObject gameObject) => OnEnabledObject?.Invoke(gameObject);
 
-        private void InvokeOnDisabledObject(GameObject gameObject) => OnDisabledObject?.Invoke(gameObject);
+        private void InvokeOnDisabledObjectEvent(GameObject gameObject) => OnDisabledObject?.Invoke(gameObject);
 
-        private void InvokeOnDestroyedObject(GameObject gameObject) => OnDestroyedObject?.Invoke(gameObject);
+        private void InvokeOnDestroyedObjectEvent(GameObject gameObject) => OnDestroyedObject?.Invoke(gameObject);
     }
 }
