@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Plugins.ObjectPoolSystem
 {
     [Serializable]
-    public class ObjectPoolPreference<T>
+    public class ObjectPoolPreference<T> where T : Enum
     {
         public T Key;
         public Func<CancellationToken, UniTask<GameObject>> CreateFunc;
